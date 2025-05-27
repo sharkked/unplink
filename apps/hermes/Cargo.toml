@@ -1,0 +1,20 @@
+[package]
+name = "hermes"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.4"
+config = "0.15.11"
+mongodb = "3.2.3"
+nanoid = "0.4.0"
+redis = "0.31.0"
+reqwest = "0.12.15"
+serde = "1.0.219"
+shuttle-axum = "0.55.0"
+shuttle-runtime = "0.55.0"
+shuttle-secrets = "0.42.0"
+tokio = "1.45.0"
+tower-http = { version = "0.6.4", features = ["cors"] }
+tracing-subscriber = "0.3.19"
+url = "2.5.4"

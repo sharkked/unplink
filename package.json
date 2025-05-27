@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "webui": "pnpm -F webui",
+    "webui:dev": "pnpm -F webui dev",
+    "hermes:run": "cargo run -p hermes",
+    "hermes:dev": "bacon run-long -- -p hermes",
+    "hermes:test": "cargo run -p hermes",
+    "hermes:build": "cargo build -p hermes"
+  }
+}

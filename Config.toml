@@ -1,0 +1,2 @@
+base_url = "http://localhost:8000"
+allow_origin = "http://localhost:5173"

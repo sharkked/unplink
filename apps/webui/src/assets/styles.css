@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+@layer base {
+  :root {
+    --color-bg: white;
+    --color-fg: black;
+  }
+
+  @variant dark {
+    :root {
+      --color-bg: black;
+      --color-fg: white;
+    }
+  }
+
+  * {
+    font-family: monospace;
+  }
+
+  body {
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+  }
+}
+
+@utility text-color {
+  color: var(--color-fg);
+}
+
+@utility bg-color {
+  background-color: var(--color-bg);
+}
+
+@utility border-color {
+  border-color: color-mix(in srgb, var(--color-fg), transparent 50%);
+}
+
+@utility feather {
+  @apply w-6 h-6 fill-none stroke-current stroke-2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
