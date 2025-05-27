@@ -1,2 +1,6 @@
 packages:
-  - 'apps/webui'
+  - apps/webui
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - cypress
+  - esbuild

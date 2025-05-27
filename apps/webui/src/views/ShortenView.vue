@@ -48,11 +48,11 @@ const onCopy = (event: Event) => {
 <template>
   <main>
     <div class="plink-cat" />
-    <form>
+    <form @submit="(e) => e.preventDefault">
       <div class="input-container w-full">
         <div class="input-icon">
           <svg class="feather">
-            <use href="../assets/feather-sprite.svg#lock" />
+            <use href="../assets/feather-sprite.svg#lock" @submit="(e) => e.preventDefault" />
           </svg>
         </div>
         <input placeholder="api key" v-model="token" type="password" />
@@ -89,7 +89,11 @@ const onCopy = (event: Event) => {
         </button>
         <output class="pr-1 text-nowrap">
           <template v-if="shortLink">{{ shortLink }}</template>
-          <template v-else>https://<span class="rainbow">unpl.ink</span>/{{ randomCode }}</template>
+          <template v-else>
+            <span class="text-color-disabled"
+              >https://<span class="rainbow">unpl.ink</span>/{{ randomCode }}</span
+            >
+          </template>
         </output>
       </div>
     </form>
@@ -100,7 +104,7 @@ const onCopy = (event: Event) => {
 @reference "@/assets/styles.css";
 
 main {
-  @apply flex flex-col flex-1 items-center justify-center gap-4;
+  @apply flex flex-col flex-1 items-center justify-center gap-4 text-color;
 }
 
 .feather {
@@ -141,20 +145,20 @@ button:not([disabled]):hover {
     @apply flex-1 outline-none;
 
     &::placeholder {
-      @apply text-color opacity-50;
+      @apply text-color-disabled;
     }
   }
 }
 
 .input-icon {
-  @apply inline-block pl-1 opacity-50;
+  @apply inline-block pl-1 text-color-disabled;
 }
 
 .btn-sm {
-  @apply w-6 h-6 p-0.75 border border-color rounded-md opacity-50;
+  @apply w-6 h-6 p-0.75 text-color-disabled border border-color rounded-md;
   transition:
     color 0.15s ease-in,
-    border-color 0.2s ease-in,
+    border-color 0.125s ease-in,
     background-color 0.15s ease;
 
   @variant enabled {
@@ -175,7 +179,7 @@ button:not([disabled]):hover {
 
 .rainbow,
 .rainbow::after {
-  @apply relative z-2 inline-block text-transparent;
+  @apply relative z-5 inline-block text-transparent;
   background-clip: text;
   background-size: 800px 100%;
   background-image: linear-gradient(
@@ -193,7 +197,7 @@ button:not([disabled]):hover {
     rgba(255, 0, 0, 1) 100%
   );
   background-repeat: repeat-x;
-  animation: rgb 8s linear infinite;
+  animation: rgb 2s linear infinite;
 }
 
 .rainbow::after {
@@ -202,9 +206,12 @@ button:not([disabled]):hover {
   top: 0;
   left: 0;
   filter: blur(4px);
-  z-index: 1;
-  @variant not-dark {
-    opacity: 0.8;
+  z-index: -1;
+}
+
+@keyframes rgb {
+  to {
+    background-position-x: 800px;
   }
 }
 </style>

@@ -1,13 +1,18 @@
 @import 'tailwindcss';
 
 @layer base {
-  :root {
+  html {
     --color-bg: white;
     --color-fg: black;
   }
 
-  @variant dark {
-    :root {
+  [data-theme='dark'] {
+    --color-bg: black;
+    --color-fg: white;
+  }
+
+  [data-theme='system'] {
+    @media (prefers-color-scheme: dark) {
       --color-bg: black;
       --color-fg: white;
     }
@@ -15,6 +20,10 @@
 
   * {
     font-family: monospace;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   body {
@@ -25,6 +34,10 @@
 
 @utility text-color {
   color: var(--color-fg);
+}
+
+@utility text-color-disabled {
+  color: color-mix(in srgb, var(--color-fg), transparent 50%);
 }
 
 @utility bg-color {

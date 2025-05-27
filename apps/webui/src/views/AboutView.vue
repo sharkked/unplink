@@ -1,13 +1,16 @@
 <template>
   <main>
-    i really don't know what it is i'm doing here, i just know that i need a link shortener and i
-    don't want to pay for it.
+    <p>
+      i really don't know what it is i'm doing here, i just know that i need a link shortener and i
+      don't want to pay for it.
+    </p>
   </main>
 </template>
 
 <style scoped>
+@reference "@/assets/styles.css";
+
 main {
-  margin: auto;
-  max-width: 640px;
+  @apply max-w-[640px] m-auto text-color;
 }
 </style>

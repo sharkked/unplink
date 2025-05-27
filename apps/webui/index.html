@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>unplink</title>
     <link rel="icon" href="/favicon.ico" />
+    <script>
+      if (!localStorage.theme) localStorage.theme = 'system'
+      document.documentElement.dataset.theme = localStorage.theme
+    </script>
   </head>
-  <body>
+  <body class="bg-color text-color">
     <div id="app" class="flex h-screen w-screen"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
