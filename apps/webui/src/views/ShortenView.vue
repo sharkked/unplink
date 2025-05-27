@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { nanoid } from 'nanoid'
 const link = ref<string>('')
+const token = ref<string>('')
 const shortLink = ref<string>('')
 
 const randomCode = ref<string>('')
@@ -23,7 +24,7 @@ async function onSubmit(event: Event) {
   shortLink.value = await fetch('http://localhost:8000', {
     method: 'POST',
     headers: {
-      'Access-Control-Allow-Header': '*',
+      Authorization: token.value,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ url: url }),
@@ -48,6 +49,14 @@ const onCopy = (event: Event) => {
   <main>
     <div class="plink-cat" />
     <form>
+      <div class="input-container w-full">
+        <div class="input-icon">
+          <svg class="feather">
+            <use href="../assets/feather-sprite.svg#lock" />
+          </svg>
+        </div>
+        <input placeholder="api key" v-model="token" type="password" />
+      </div>
       <div class="input-container w-full">
         <div class="input-icon">
           <svg class="feather">

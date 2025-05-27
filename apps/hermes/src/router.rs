@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{AppConfig, cache::Cache};
+use crate::{AppConfig, cache::Cache, db::MongoConnection};
 use axum::{
     Json, Router,
     extract::Path,
@@ -9,9 +9,14 @@ use axum::{
     routing::{get, post},
 };
 use nanoid::nanoid;
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 use shuttle_runtime::SecretStore;
-use tower_http::cors::{Any, CorsLayer};
+use tower::ServiceBuilder;
+use tower_http::{
+    auth::AsyncRequireAuthorizationLayer,
+    cors::{Any, CorsLayer},
+};
 use url::Url;
 
 #[derive(Deserialize)]
@@ -42,14 +47,16 @@ async fn shorten(
     }
     // @TODO: deny own redirects
     let uid = nanoid!(10, &nanoid::alphabet::SAFE); // @TODO generate UID
-    match state.cache.set::<String>(&uid, &payload.url) {
+    // match state.cache.set::<String>(&uid, &payload.url) {
+    match state.db.set_url(&uid, &payload.url).await {
         Ok(()) => ShortenResponse::ok(&format!("{}/{uid}", state.base_url)),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
 async fn redirect(Path(path): Path<String>, state: Arc<AppState>) -> HttpResult<Redirect> {
-    match state.cache.get::<String>(&path) {
+    // match state.cache.get::<String>(&path) {
+    match state.db.find_url(&path).await {
         Ok(url) => Ok(Redirect::permanent(&url[..])),
         _ => Err(StatusCode::NOT_FOUND),
     }
@@ -58,16 +65,24 @@ async fn redirect(Path(path): Path<String>, state: Arc<AppState>) -> HttpResult<
 struct AppState {
     base_url: String,
     cache: Cache,
+    db: MongoConnection,
 }
 
-pub fn create(config: AppConfig, secrets: SecretStore) -> Router {
+pub async fn create(config: AppConfig, secrets: SecretStore) -> Router {
     let state = Arc::new(AppState {
         base_url: config.base_url,
         cache: Cache::open(
             &secrets
-                .get("redis_url")
+                .get("redis_uri")
                 .expect("redis connection string was not found"),
         )
+        .unwrap(),
+        db: MongoConnection::open(
+            &secrets
+                .get("mongo_uri")
+                .expect("mongo connection string was not found"),
+        )
+        .await
         .unwrap(),
     });
 
@@ -87,9 +102,15 @@ pub fn create(config: AppConfig, secrets: SecretStore) -> Router {
             }),
         )
         .layer(
-            CorsLayer::new()
-                .allow_headers(Any)
-                .allow_methods(Any)
-                .allow_origin(config.allow_origin.parse::<HeaderValue>().unwrap()),
+            ServiceBuilder::new()
+                .layer(AsyncRequireAuthorizationLayer::new(
+                    crate::auth::TokenAuth {},
+                ))
+                .layer(
+                    CorsLayer::new()
+                        .allow_headers([AUTHORIZATION, CONTENT_TYPE])
+                        .allow_methods(Any)
+                        .allow_origin(config.allow_origin.parse::<HeaderValue>().unwrap()),
+                ),
         )
 }

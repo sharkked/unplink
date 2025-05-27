@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.4"
+axum-login = "0.17.0"
 config = "0.15.11"
 mongodb = "3.2.3"
 nanoid = "0.4.0"
@@ -14,7 +15,9 @@ serde = "1.0.219"
 shuttle-axum = "0.55.0"
 shuttle-runtime = "0.55.0"
 shuttle-secrets = "0.42.0"
+sqlx = "0.8.6"
 tokio = "1.45.0"
-tower-http = { version = "0.6.4", features = ["cors"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.4", features = ["auth", "cors"] }
 tracing-subscriber = "0.3.19"
 url = "2.5.4"

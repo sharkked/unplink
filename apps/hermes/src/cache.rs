@@ -6,8 +6,8 @@ pub struct Cache {
 }
 
 impl Cache {
-    pub fn open(url: &String) -> RedisResult<Self> {
-        let client = redis::Client::open(url.clone())?;
+    pub fn open(uri: &String) -> RedisResult<Self> {
+        let client = redis::Client::open(uri.clone())?;
         Ok(Cache { client })
     }
 

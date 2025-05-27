@@ -1,3 +1,4 @@
+mod auth;
 mod cache;
 mod db;
 mod router;
@@ -23,5 +24,5 @@ async fn axum(#[shuttle_runtime::Secrets] secrets: SecretStore) -> shuttle_axum:
 
     let router = router::create(config, secrets);
 
-    Ok(router.into())
+    Ok(router.await.into())
 }
