@@ -5,6 +5,12 @@
     "hermes:run": "cargo run -p hermes",
     "hermes:dev": "bacon run-long -- -p hermes",
     "hermes:test": "cargo run -p hermes",
-    "hermes:build": "cargo build -p hermes"
+    "hermes:build": "cargo build -p hermes",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7"
   }
 }
