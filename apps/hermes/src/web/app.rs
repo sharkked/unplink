@@ -8,6 +8,7 @@ use axum::{
     response::Redirect,
     routing::{get, post},
 };
+use axum_login::AuthManagerLayerBuilder;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use shuttle_runtime::SecretStore;
@@ -17,6 +18,8 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_sessions::{ExpiredDeletion, Expiry, SessionManagerLayer};
 use tower_sessions_sqlx_store::PostgresStore;
 use url::Url;
+
+use crate::users::Backend;
 
 #[derive(Deserialize)]
 struct ShortenRequest {
@@ -117,8 +120,12 @@ impl App {
         let session_layer = SessionManagerLayer::new(session_store).with_secure(false); // @TODO: change
         // .with_expiry(Expiry::OnInactivity(::from_secs(10)));
 
+        let backend = Backend::new(self.state.db.clone());
+        let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
+
         let router = Router::new()
             .route("/", post(shorten))
+            .route_layer(auth_layer)
             .route("/{path}", get(redirect))
             .layer(
                 ServiceBuilder::new().layer(
