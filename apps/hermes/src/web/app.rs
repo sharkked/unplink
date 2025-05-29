@@ -1,22 +1,21 @@
 use std::sync::Arc;
 
-use crate::{AppConfig, cache::Cache, db::MongoConnection};
+use crate::db::MongoConnection;
 use axum::{
     Json, Router,
     extract::Path,
-    http::{HeaderValue, StatusCode},
+    http::{
+        HeaderValue, StatusCode,
+        header::{AUTHORIZATION, CONTENT_TYPE},
+    },
     response::Redirect,
     routing::{get, post},
 };
 use nanoid::nanoid;
-use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 use shuttle_runtime::SecretStore;
 use tower::ServiceBuilder;
-use tower_http::{
-    auth::AsyncRequireAuthorizationLayer,
-    cors::{Any, CorsLayer},
-};
+use tower_http::cors::{Any, CorsLayer};
 use url::Url;
 
 #[derive(Deserialize)]
@@ -62,55 +61,64 @@ async fn redirect(Path(path): Path<String>, state: Arc<AppState>) -> HttpResult<
     }
 }
 
+#[derive(Deserialize)]
+pub struct AppConfig {
+    base_url: String,
+    allow_origin: String,
+}
+
 struct AppState {
     base_url: String,
-    cache: Cache,
     db: MongoConnection,
 }
 
-pub async fn create(config: AppConfig, secrets: SecretStore) -> Router {
-    let state = Arc::new(AppState {
-        base_url: config.base_url,
-        cache: Cache::open(
-            &secrets
-                .get("redis_uri")
-                .expect("redis connection string was not found"),
-        )
-        .unwrap(),
-        db: MongoConnection::open(
+pub struct App {
+    config: AppConfig,
+    state: Arc<AppState>,
+}
+
+impl App {
+    pub async fn create(config: AppConfig, secrets: SecretStore) -> Self {
+        let db = MongoConnection::open(
             &secrets
                 .get("mongo_uri")
                 .expect("mongo connection string was not found"),
         )
         .await
-        .unwrap(),
-    });
+        .unwrap();
 
-    Router::new()
-        .route(
-            "/",
-            post({
-                let shared_state = Arc::clone(&state);
-                move |body| shorten(body, shared_state)
+        Self {
+            state: Arc::new(AppState {
+                base_url: config.base_url.clone(),
+                db,
             }),
-        )
-        .route(
-            "/{path}",
-            get({
-                let shared_state = Arc::clone(&state);
-                move |body| redirect(body, shared_state)
-            }),
-        )
-        .layer(
-            ServiceBuilder::new()
-                .layer(AsyncRequireAuthorizationLayer::new(
-                    crate::auth::TokenAuth {},
-                ))
-                .layer(
+            config,
+        }
+    }
+
+    pub fn router(&self) -> Router {
+        Router::new()
+            .route(
+                "/",
+                post({
+                    let shared_state = Arc::clone(&self.state);
+                    move |body| shorten(body, shared_state)
+                }),
+            )
+            .route(
+                "/{path}",
+                get({
+                    let shared_state = Arc::clone(&self.state);
+                    move |body| redirect(body, shared_state)
+                }),
+            )
+            .layer(
+                ServiceBuilder::new().layer(
                     CorsLayer::new()
                         .allow_headers([AUTHORIZATION, CONTENT_TYPE])
                         .allow_methods(Any)
-                        .allow_origin(config.allow_origin.parse::<HeaderValue>().unwrap()),
+                        .allow_origin(self.config.allow_origin.parse::<HeaderValue>().unwrap()),
                 ),
-        )
+            )
+    }
 }

@@ -1,17 +1,9 @@
-mod auth;
-mod cache;
 mod db;
-mod router;
+mod web;
 
 use config::Config;
-use serde::Deserialize;
 use shuttle_runtime::SecretStore;
-
-#[derive(Deserialize)]
-struct AppConfig {
-    base_url: String,
-    allow_origin: String,
-}
+use web::{App, AppConfig};
 
 #[shuttle_runtime::main]
 async fn axum(#[shuttle_runtime::Secrets] secrets: SecretStore) -> shuttle_axum::ShuttleAxum {
@@ -22,7 +14,7 @@ async fn axum(#[shuttle_runtime::Secrets] secrets: SecretStore) -> shuttle_axum:
         .try_deserialize::<AppConfig>()
         .unwrap();
 
-    let router = router::create(config, secrets);
+    let app = App::create(config, secrets).await;
 
-    Ok(router.await.into())
+    Ok(app.router().into())
 }
