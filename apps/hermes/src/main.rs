@@ -1,20 +1,15 @@
-mod db;
+mod users;
 mod web;
 
-use config::Config;
 use shuttle_runtime::SecretStore;
-use web::{App, AppConfig};
+use sqlx::PgPool;
+use web::App;
 
 #[shuttle_runtime::main]
-async fn axum(#[shuttle_runtime::Secrets] secrets: SecretStore) -> shuttle_axum::ShuttleAxum {
-    let config = Config::builder()
-        .add_source(config::File::with_name("Config.toml"))
-        .build()
-        .unwrap()
-        .try_deserialize::<AppConfig>()
-        .unwrap();
-
-    let app = App::create(config, secrets).await;
-
-    Ok(app.router().into())
+async fn axum(
+    #[shuttle_shared_db::Postgres] pool: PgPool,
+    #[shuttle_runtime::Secrets] secrets: SecretStore,
+) -> shuttle_axum::ShuttleAxum {
+    let app = App::create(pool, secrets).await.unwrap();
+    Ok(app.router().await.unwrap().into())
 }
