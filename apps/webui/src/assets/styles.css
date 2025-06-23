@@ -1,55 +1,101 @@
-@import 'tailwindcss';
+:root {
+  --color-on: white;
+  --color-off: black;
+  --color-half: color-mix(in srgb, var(--color-fg), var(--color-bg) 50%);
 
-@layer base {
-  html {
-    --color-bg: white;
-    --color-fg: black;
-  }
+  font-size: 1rem;
+}
 
-  [data-theme='dark'] {
-    --color-bg: black;
-    --color-fg: white;
-  }
+html {
+  --color-bg: var(--color-on);
+  --color-fg: var(--color-off);
+}
 
-  [data-theme='system'] {
-    @media (prefers-color-scheme: dark) {
-      --color-bg: black;
-      --color-fg: white;
-    }
-  }
+[data-theme='dark'] {
+  --color-bg: var(--color-off);
+  --color-fg: var(--color-on);
+}
 
-  * {
-    font-family: monospace;
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  body {
-    color: var(--color-fg);
-    background-color: var(--color-bg);
+[data-theme='system'] {
+  @media (prefers-color-scheme: dark) {
+    --color-bg: var(--color-off);
+    --color-fg: var(--color-on);
   }
 }
 
-@utility text-color {
+* {
+  font-family: monospace;
+  font-size: 0.75rem;
   color: var(--color-fg);
 }
 
-@utility text-color-disabled {
-  color: color-mix(in srgb, var(--color-fg), transparent 50%);
-}
-
-@utility bg-color {
+body {
+  margin: 0;
+  color: var(--color-fg);
   background-color: var(--color-bg);
 }
 
-@utility border-color {
-  border-color: color-mix(in srgb, var(--color-fg), transparent 50%);
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
 }
 
-@utility feather {
-  @apply w-6 h-6 fill-none stroke-current stroke-2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+main {
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+}
+
+input,
+button {
+  box-sizing: border-box;
+  display: inline-block;
+  margin: unset;
+  padding: unset;
+  background: unset;
+  border: unset;
+}
+
+a {
+  color: unset;
+  text-decoration: none;
+}
+
+.rainbow,
+.rainbow::after {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+  background-clip: text;
+  background-size: 800px 100%;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(255, 154, 0, 1) 10%,
+    rgba(208, 222, 33, 1) 20%,
+    rgba(79, 220, 74, 1) 30%,
+    rgba(63, 218, 216, 1) 40%,
+    rgba(47, 201, 226, 1) 50%,
+    rgba(28, 127, 238, 1) 60%,
+    rgba(95, 21, 242, 1) 70%,
+    rgba(186, 12, 248, 1) 80%,
+    rgba(251, 7, 217, 1) 90%,
+    rgba(255, 0, 0, 1) 100%
+  );
+  background-repeat: repeat-x;
+  animation: rgb 2s linear infinite;
+}
+
+.rainbow::after {
+  content: 'unpl.ink';
+  position: absolute;
+  inset: 0;
+  filter: blur(4px);
+}
+
+@keyframes rgb {
+  to {
+    background-position-x: 800px;
+  }
 }

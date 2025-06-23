@@ -12,10 +12,10 @@ use axum_login::AuthManagerLayerBuilder;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use shuttle_runtime::SecretStore;
-use sqlx::{PgPool, prelude::FromRow};
+use sqlx::{PgPool, Row};
 use tower::ServiceBuilder;
 use tower_http::cors::{Any, CorsLayer};
-use tower_sessions::{ExpiredDeletion, Expiry, SessionManagerLayer};
+use tower_sessions::{ExpiredDeletion, SessionManagerLayer};
 use tower_sessions_sqlx_store::PostgresStore;
 use url::Url;
 
@@ -50,13 +50,13 @@ async fn shorten(
     // @TODO: deny own redirects
     let code = nanoid!(10, &nanoid::alphabet::SAFE); // @TODO: collision detection
 
-    let result = sqlx::query("insert into shortlinks (url, code) values (?, ?)")
+    let query = sqlx::query("insert into shortlinks (url, code) values (?, ?)")
         .bind(&payload.url)
         .bind(&code)
         .execute(&state.db)
         .await;
 
-    match result {
+    match query {
         Ok(_) => ShortenResponse::ok(&format!(
             "{}/{code}",
             state.secrets.get("base_url").unwrap()
@@ -65,22 +65,17 @@ async fn shorten(
     }
 }
 
-#[derive(FromRow)]
-struct ShortLink {
-    id: i64,
-    url: String,
-    code: String,
-}
-
 async fn redirect(Path(path): Path<String>, state: State<AppState>) -> HttpResult<Redirect> {
-    let result: Result<Option<ShortLink>, sqlx::Error> =
-        sqlx::query_as("select * from shortlinks where code = ?")
-            .bind(&path)
-            .fetch_optional(&state.db)
-            .await;
+    let query = sqlx::query("select * from shortlinks where code = ?")
+        .bind(&path)
+        .fetch_optional(&state.db)
+        .await;
 
-    match result {
-        Ok(Some(link)) => Ok(Redirect::permanent(&link.url[..])),
+    match query {
+        Ok(Some(query)) => {
+            let url: String = query.get("url");
+            Ok(Redirect::permanent(&url[..]))
+        }
         _ => Err(StatusCode::NOT_FOUND),
     }
 }
@@ -117,8 +112,8 @@ impl App {
                 .continuously_delete_expired(tokio::time::Duration::from_secs(60)),
         );
 
-        let session_layer = SessionManagerLayer::new(session_store).with_secure(false); // @TODO: change
-        // .with_expiry(Expiry::OnInactivity(::from_secs(10)));
+        let session_layer = SessionManagerLayer::new(session_store).with_secure(false); // @TODO: with_secure(true)
+        // .with_expiry(Expiry::OnInactivity(::from_secs(10))); // @TODO
 
         let backend = Backend::new(self.state.db.clone());
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
@@ -137,8 +132,7 @@ impl App {
                                 .secrets
                                 .get("allow_origin")
                                 .unwrap()
-                                .parse::<HeaderValue>()
-                                .unwrap(),
+                                .parse::<HeaderValue>()?,
                         ),
                 ),
             )

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ShortenView from '../views/ShortenView.vue'
+import IndexPage from '../pages/index.vue'
 
 const DEFAULT_TITLE = 'unplink'
 const router = createRouter({
@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: ShortenView,
+      component: IndexPage,
     },
     {
       path: '/about',
@@ -16,7 +16,7 @@ const router = createRouter({
       meta: {
         title: `about @ ${DEFAULT_TITLE}`,
       },
-      component: () => import('../views/AboutView.vue'),
+      component: () => import('../pages/about.vue'),
     },
   ],
 })

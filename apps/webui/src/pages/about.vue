@@ -6,11 +6,3 @@
     </p>
   </main>
 </template>
-
-<style scoped>
-@reference "@/assets/styles.css";
-
-main {
-  @apply max-w-[640px] m-auto text-color;
-}
-</style>
