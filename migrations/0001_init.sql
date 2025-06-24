@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
     id serial PRIMARY KEY,
-    email: varchar(320) UNIQUE NOT NULL,
+    email varchar(320) NOT NULL,
+    UNIQUE (email)
 );
 
 CREATE TABLE IF NOT EXISTS shortlinks (
     id serial PRIMARY KEY,
-    code VARCHAR(16) UNIQUE NOT NULL,
-    url VARCHAR(2048) NOT NULL,
+    code varchar(16) NOT NULL,
+    url varchar(2048) NOT NULL,
+    UNIQUE (code)
 );

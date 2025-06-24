@@ -8,20 +8,32 @@ const props = defineProps<{
   icon: string
   placeholder?: string
   clearable?: boolean
+  readonly?: boolean
 }>()
 
-const modelValue = defineModel<string>()
+const inputText = defineModel<string>()
+
+defineEmits(['submit'])
 
 const showClear = computed(
-  () => !props.clearable && modelValue.value && modelValue.value.length > 0,
+  () =>
+    props.clearable &&
+    !props.readonly &&
+    inputText.value != undefined &&
+    inputText.value.length > 0,
 )
+
+const handleClear = () => {
+  if (!props.clearable) return
+  inputText.value = ''
+}
 </script>
 
 <template>
-  <label class="input-text">
+  <label class="input-text" @keydown.enter="$emit('submit')">
     <FeatherIcon class="icon" :icon />
-    <input v-model="modelValue" :type :placeholder @keydown.esc="modelValue = ''" />
-    <button :disabled="!showClear" @click="modelValue = ''">
+    <input v-model="inputText" :type :placeholder :readonly @keydown.esc="handleClear" />
+    <button :disabled="!showClear" @click="handleClear">
       <FeatherIcon class="icon" icon="x" />
     </button>
   </label>
@@ -32,8 +44,6 @@ const showClear = computed(
   box-sizing: border-box;
   display: inline-flex;
   height: 2rem;
-  padding: 0 0.5rem;
-  gap: 0.5rem;
   text-wrap: nowrap;
   background-color: var(--color-bg);
   border: 1px solid var(--color-half);
@@ -43,25 +53,33 @@ const showClear = computed(
     outline: 1px solid var(--color-fg);
   }
 
-  & > * {
+  & .icon {
     margin: auto 0;
+    color: var(--color-half);
+    padding: 0 0.5rem;
   }
 
   input {
     flex: 1;
+    color: var(--color-fg);
     outline: none;
+  }
 
-    &::placeholder {
-      color: var(--color-half);
+  button {
+    height: 100%;
+
+    & > * {
+      display: block;
+      margin: auto;
     }
-  }
 
-  .icon {
-    color: var(--color-half);
-  }
+    &:hover {
+      cursor: pointer;
+    }
 
-  button:disabled {
-    visibility: hidden;
+    &:disabled {
+      display: none;
+    }
   }
 }
 </style>

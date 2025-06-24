@@ -1,7 +1,7 @@
+use async_trait::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use password_auth::verify_password;
 use serde::{Deserialize, Serialize};
-use shuttle_runtime::async_trait;
 use sqlx::{FromRow, PgPool};
 use tokio::task;
 

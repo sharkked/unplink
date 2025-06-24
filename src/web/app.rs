@@ -11,7 +11,6 @@ use axum::{
 use axum_login::AuthManagerLayerBuilder;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
-use shuttle_runtime::SecretStore;
 use sqlx::{PgPool, Row};
 use tower::ServiceBuilder;
 use tower_http::cors::{Any, CorsLayer};
@@ -47,26 +46,25 @@ async fn shorten(
     if !Url::parse(&payload.url).is_ok() {
         return Err(StatusCode::BAD_REQUEST);
     }
-    // @TODO: deny own redirects
-    let code = nanoid!(10, &nanoid::alphabet::SAFE); // @TODO: collision detection
 
-    let query = sqlx::query("insert into shortlinks (url, code) values (?, ?)")
+    // @TODO: deny own redirects
+    // @TODO: collision detection
+    let code = nanoid!(10, &nanoid::alphabet::SAFE);
+
+    let query = sqlx::query("insert into shortlinks (url, code) values ($1, $2)")
         .bind(&payload.url)
         .bind(&code)
         .execute(&state.db)
         .await;
 
     match query {
-        Ok(_) => ShortenResponse::ok(&format!(
-            "{}/{code}",
-            state.secrets.get("base_url").unwrap()
-        )),
+        Ok(_) => ShortenResponse::ok(&format!("{}/{code}", std::env::var("BASE_URL").unwrap())),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
 async fn redirect(Path(path): Path<String>, state: State<AppState>) -> HttpResult<Redirect> {
-    let query = sqlx::query("select * from shortlinks where code = ?")
+    let query = sqlx::query("select * from shortlinks where code = $1")
         .bind(&path)
         .fetch_optional(&state.db)
         .await;
@@ -82,7 +80,6 @@ async fn redirect(Path(path): Path<String>, state: State<AppState>) -> HttpResul
 
 #[derive(Clone)]
 pub struct AppState {
-    secrets: SecretStore,
     db: PgPool,
 }
 
@@ -91,14 +88,9 @@ pub struct App {
 }
 
 impl App {
-    pub async fn create(
-        db: PgPool,
-        secrets: SecretStore,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        sqlx::migrate!().run(&db).await?;
-
+    pub async fn create(db: PgPool) -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
-            state: AppState { secrets, db },
+            state: AppState { db },
         })
     }
 
@@ -128,9 +120,7 @@ impl App {
                         .allow_headers([AUTHORIZATION, CONTENT_TYPE])
                         .allow_methods(Any)
                         .allow_origin(
-                            self.state
-                                .secrets
-                                .get("allow_origin")
+                            std::env::var("ALLOW_ORIGIN")
                                 .unwrap()
                                 .parse::<HeaderValue>()?,
                         ),

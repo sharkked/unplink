@@ -29,6 +29,12 @@ import FeatherIcon from './feather-icon.vue'
     &.router-link-active {
       color: var(--color-fg);
     }
+
+    &,
+    & > * {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
   }
 }
 </style>

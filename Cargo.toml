@@ -1,3 +1,24 @@
-[workspace]
-resolver = "3"
-members = ["apps/hermes"]
+[package]
+name = "hermes"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+async-trait = "0.1.88"
+axum = "0.8.4"
+axum-login = "0.17.0"
+config = "0.15.11"
+dotenv = "0.15.0"
+nanoid = "0.4.0"
+password-auth = "1.0.0"
+serde = "1.0.219"
+sqlx = "0.8.6"
+thiserror = "2.0.12"
+tokio = { version = "1.45.0", features = ["rt-multi-thread"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.4", features = ["auth", "cors"] }
+tower-sessions = "0.14.0"
+tower-sessions-sqlx-store = { version = "0.15.0", features = ["postgres"] }
+tracing-subscriber = "0.3.19"
+url = "2.5.4"

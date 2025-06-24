@@ -2,11 +2,13 @@
 import { ref } from 'vue'
 import { nanoid } from 'nanoid'
 
+import { useLinks } from '@/hooks/useLinks'
 import InputText from '@/components/input-text.vue'
 import InputButton from '@/components/input-button.vue'
 
+const { token, shorten, lastResult } = useLinks()
+
 const link = ref<string>('')
-const token = ref<string>('')
 const shortLink = ref<string>('')
 
 const randomCode = ref<string>('')
@@ -23,16 +25,7 @@ async function handleSubmit() {
     url = 'https://' + url
   }
 
-  const shortLink = await fetch('http://localhost:8000', {
-    method: 'POST',
-    headers: {
-      Authorization: token.value,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ url: url }),
-  })
-  const data = await shortLink.json()
-  return data.url
+  shorten(url)
 }
 
 const handleCopy = () => {
@@ -44,17 +37,18 @@ const handleCopy = () => {
 <template>
   <main>
     <div class="plink-cat" />
-    <form @submit.prevent="handleSubmit">
+    <form>
+      <InputText v-model="token" type="password" icon="lock" placeholder="api key" />
       <InputText
-        v-model="token"
-        type="password"
-        icon="lock"
-        placeholder="api key"
+        v-model="link"
+        type="url"
+        icon="link"
+        placeholder="paste link here :3"
         :clearable="true"
+        @submit="handleSubmit"
       />
-      <InputText v-model="link" type="url" icon="link" placeholder="paste link here :3" />
       <InputButton class="copy-button" icon="copy" @click.prevent="handleCopy">
-        <template v-if="shortLink">{{ shortLink }}</template>
+        <template v-if="lastResult">{{ lastResult }}</template>
         <template v-else>
           <span class="text-color-disabled"
             >https://<span class="rainbow">unpl.ink</span>/{{ randomCode }}</span
