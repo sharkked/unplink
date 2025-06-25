@@ -4,6 +4,7 @@ import FeatherIcon from "./feather-icon.vue";
 
 <template>
   <nav class="global-nav">
+    <h1>unpl.ink</h1>
     <RouterLink to="/">
       <FeatherIcon icon="link" /><span>shorten</span>
     </RouterLink>
@@ -26,11 +27,15 @@ import FeatherIcon from "./feather-icon.vue";
   width: 8rem;
   flex-direction: column;
   padding: 0.25rem;
+  color: var(--color-half);
   border-right: 1px solid var(--color-half);
+
+  h1 {
+    margin: 0.25rem 0.5rem;
+  }
 
   a {
     display: block;
-    color: var(--color-half);
     padding: 0.5rem;
     border-radius: var(--radius);
     white-space: nowrap;
