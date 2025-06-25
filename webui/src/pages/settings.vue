@@ -6,8 +6,7 @@ import InputText from "@/components/input-text.vue";
 import InputSelect from "@/components/input-select.vue";
 
 const state = useGlobalState();
-const themeColor = ref(state.value.theme);
-const apiKey = ref<string>("");
+const currentTheme = ref<string>(state.value.theme);
 
 const username = ref<string>("");
 const password = ref<string>("");
@@ -19,10 +18,8 @@ const themeOptions = [
 ];
 
 const setTheme = (theme: string) => {
-  state.value.theme = theme;
-  console.log(state.value);
   document.documentElement.dataset.theme = theme;
-  themeColor.value = theme;
+  state.value.theme = theme;
 };
 
 const handleLogin = () => {
@@ -34,13 +31,13 @@ const handleLogin = () => {
   <main>
     <h1>theme</h1>
     <InputSelect
+      v-model="currentTheme"
       :options="themeOptions"
-      :model-value="themeColor"
       @update:model-value="(value) => setTheme(value as string)"
     />
     <h1>authorization</h1>
     <InputText
-      v-model="apiKey"
+      v-model="state.apiKey"
       type="password"
       icon="lock"
       placeholder="api key"
