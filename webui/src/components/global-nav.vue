@@ -4,7 +4,7 @@ import FeatherIcon from "./feather-icon.vue";
 
 <template>
   <nav class="global-nav">
-    <h1>unpl.ink</h1>
+    <h1 class="rainbow">unpl.ink</h1>
     <RouterLink to="/">
       <FeatherIcon icon="link" /><span>shorten</span>
     </RouterLink>

@@ -1,3 +1,3 @@
 <template>
-  <main>WIP</main>
+  <main><h1>wip</h1></main>
 </template>
