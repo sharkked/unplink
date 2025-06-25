@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use tokio::task;
 
+pub type AuthSession = axum_login::AuthSession<Backend>;
+
 #[derive(Clone, Serialize, Deserialize, FromRow)]
 pub struct User {
     id: i64,
@@ -90,5 +92,3 @@ impl AuthnBackend for Backend {
         Ok(user)
     }
 }
-
-pub type AuthSession = axum_login::AuthSession<Backend>;

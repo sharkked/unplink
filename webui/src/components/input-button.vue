@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FeatherIcon from './feather-icon.vue'
+import FeatherIcon from "./feather-icon.vue";
 
-defineProps<{ icon: string }>()
+defineProps<{ icon: string }>();
 </script>
 
 <template>
@@ -16,45 +16,31 @@ defineProps<{ icon: string }>()
 <style scoped>
 .input-button {
   box-sizing: border-box;
-  display: inline-flex;
+  display: flex;
   height: 2rem;
   padding: 0 0.5rem;
   gap: 0.5rem;
   text-wrap: nowrap;
-  color: var(--color-fg);
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-half);
-  border-radius: 6px;
+  color: var(--color-on);
+  background-color: var(--color-off);
+  border: 1px solid var(--color-on);
+  border-radius: var(--radius);
 
   &:focus-within {
-    outline: 1px solid var(--color-fg);
+    outline: 1px solid var(--color-on);
   }
 
   & > * {
     margin: auto 0;
   }
 
-  input {
-    flex: 1;
-    outline: none;
-
-    &::placeholder {
-      color: var(--color-half);
-    }
-  }
-
-  .icon {
+  &:disabled {
     color: var(--color-half);
+    border-color: var(--color-half);
   }
 
-  button {
-    &:disabled {
-      visibility: hidden;
-    }
-
-    &:not([disabled]):hover {
-      cursor: pointer;
-    }
+  &:not(:disabled):hover {
+    cursor: pointer;
   }
 }
 </style>

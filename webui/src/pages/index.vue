@@ -1,103 +1,64 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { nanoid } from 'nanoid'
+import { ref } from "vue";
+import { nanoid } from "nanoid";
 
-import { useLinks } from '@/hooks/useLinks'
-import InputText from '@/components/input-text.vue'
-import InputButton from '@/components/input-button.vue'
+import { useLinks } from "@/hooks/useLinks";
+import InputText from "@/components/input-text.vue";
+import InputButton from "@/components/input-button.vue";
 
-const { token, shorten, lastResult } = useLinks()
+const { shorten, lastResult } = useLinks();
 
-const link = ref<string>('')
-const shortLink = ref<string>('')
-
-const randomCode = ref<string>('')
+const inputLink = ref<string>("");
+const randomCode = ref<string>("");
 
 const randomizeText = () => {
-  randomCode.value = nanoid(10)
-  requestAnimationFrame(randomizeText)
-}
-randomizeText()
+  randomCode.value = nanoid(24);
+  requestAnimationFrame(randomizeText);
+};
+randomizeText();
 
 async function handleSubmit() {
-  let url = link.value
+  let url = inputLink.value;
   if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url
+    url = "https://" + url;
   }
 
-  shorten(url)
+  shorten(url);
 }
 
 const handleCopy = () => {
-  if (!shortLink.value) return
-  navigator.clipboard.writeText(shortLink.value)
-}
+  if (!lastResult.value) return;
+  navigator.clipboard.writeText(lastResult.value);
+};
 </script>
 
 <template>
-  <main>
-    <div class="plink-cat" />
-    <form>
-      <InputText v-model="token" type="password" icon="lock" placeholder="api key" />
-      <InputText
-        v-model="link"
-        type="url"
-        icon="link"
-        placeholder="paste link here :3"
-        :clearable="true"
-        @submit="handleSubmit"
-      />
-      <InputButton class="copy-button" icon="copy" @click.prevent="handleCopy">
-        <template v-if="lastResult">{{ lastResult }}</template>
-        <template v-else>
-          <span class="text-color-disabled"
-            >https://<span class="rainbow">unpl.ink</span>/{{ randomCode }}</span
-          >
-        </template>
-      </InputButton>
-    </form>
-  </main>
+  <form>
+    <h1>short linkener</h1>
+    <InputText
+      v-model="inputLink"
+      type="url"
+      icon="link"
+      placeholder="paste link here :3"
+      :clearable="true"
+      @submit="handleSubmit"
+    />
+    <InputButton
+      class="copy-button"
+      icon="copy"
+      :data-result="lastResult"
+      :disabled="lastResult == ''"
+      @click.prevent="handleCopy"
+    >
+      <template v-if="lastResult">{{ lastResult }}</template>
+      <template v-else> https://{{ randomCode }} </template>
+    </InputButton>
+  </form>
 </template>
 
 <style>
-.plink-cat {
-  position: relative;
-  margin: auto;
-  margin-bottom: 1rem;
-
-  &,
-  &:after {
-    width: 318px;
-    height: 128px;
-    background-image: url('https://c.tenor.com/y1QFa-1vyKYAAAAd/tenor.gif');
-    background-size: contain;
-    border-radius: 6px;
-  }
-
-  &:after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    opacity: 40%;
-    filter: blur(15px) saturate(1.5);
-  }
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  max-width: 480px;
-  gap: 0.25rem;
-
-  &,
-  & > * {
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .copy-button {
-    width: min-content;
-  }
+.copy-button {
+  width: min-content;
+  margin: 0 auto;
 }
 </style>

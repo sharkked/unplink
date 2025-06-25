@@ -1,40 +1,64 @@
 <script setup lang="ts">
-import ThemeSelector from './theme-selector.vue'
-import FeatherIcon from './feather-icon.vue'
+import FeatherIcon from "./feather-icon.vue";
 </script>
 
 <template>
   <nav class="global-nav">
-    <ThemeSelector />
     <RouterLink to="/">
-      <FeatherIcon icon="home" />
+      <FeatherIcon icon="link" /><span>shorten</span>
     </RouterLink>
+    <RouterLink to="/history">
+      <FeatherIcon icon="clock" /><span>history</span>
+    </RouterLink>
+    <div class="spacer"></div>
     <RouterLink to="/about">
-      <FeatherIcon icon="info" />
+      <FeatherIcon icon="info" /><span>about</span>
+    </RouterLink>
+    <RouterLink to="/config">
+      <FeatherIcon icon="settings" /><span>config</span>
     </RouterLink>
   </nav>
 </template>
 
 <style>
 .global-nav {
-  position: absolute;
   display: flex;
+  width: 8rem;
   flex-direction: column;
-  padding: 0.5rem;
-  gap: 0.5rem;
+  padding: 0.25rem;
+  border-right: 1px solid var(--color-half);
 
   a {
+    display: block;
     color: var(--color-half);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    white-space: nowrap;
+    transition: scale 0.1s ease;
 
     &.router-link-active {
-      color: var(--color-fg);
+      color: var(--color-off);
+      background: var(--color-on);
     }
 
-    &,
-    & > * {
-      width: 1.5rem;
-      height: 1.5rem;
+    & > svg {
+      line-height: 1;
+      vertical-align: bottom;
     }
+
+    & span {
+      padding-left: 0.5rem;
+    }
+
+    &:active {
+      color: var(--color-off);
+      background-color: var(--color-half);
+      scale: 0.98;
+    }
+  }
+
+  .spacer {
+    flex: 1;
   }
 }
 </style>

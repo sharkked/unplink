@@ -51,7 +51,7 @@ async fn shorten(
     // @TODO: collision detection
     let code = nanoid!(10, &nanoid::alphabet::SAFE);
 
-    let query = sqlx::query("insert into shortlinks (url, code) values ($1, $2)")
+    let query = sqlx::query("INSERT INTO shortlinks (url, code) VALUES ($1, $2)")
         .bind(&payload.url)
         .bind(&code)
         .execute(&state.db)
@@ -64,7 +64,7 @@ async fn shorten(
 }
 
 async fn redirect(Path(path): Path<String>, state: State<AppState>) -> HttpResult<Redirect> {
-    let query = sqlx::query("select * from shortlinks where code = $1")
+    let query = sqlx::query("SELECT * FROM shortlinks WHERE code = $1")
         .bind(&path)
         .fetch_optional(&state.db)
         .await;

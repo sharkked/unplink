@@ -1,10 +1,10 @@
-import eslint from '@eslint/js'
-import eslintConfigPrettier from 'eslint-config-prettier/flat'
-import eslintPluginVue from 'eslint-plugin-vue'
-import eslintPluginVitest from '@vitest/eslint-plugin'
-import globals from 'globals'
-import typescriptEslint from 'typescript-eslint'
-import vueParser from 'vue-eslint-parser'
+import eslint from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier/flat";
+import eslintPluginVue from "eslint-plugin-vue";
+import eslintPluginVitest from "@vitest/eslint-plugin";
+import globals from "globals";
+import typescriptEslint from "typescript-eslint";
+import vueParser from "vue-eslint-parser";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -12,13 +12,13 @@ import vueParser from 'vue-eslint-parser'
 export default typescriptEslint.config([
   eslint.configs.recommended,
   typescriptEslint.configs.recommended,
-  eslintPluginVue.configs['flat/recommended'],
+  eslintPluginVue.configs["flat/recommended"],
   {
     ...eslintPluginVitest.configs.recommended,
-    files: ['src/**/__tests__/*'],
+    files: ["src/**/__tests__/*"],
   },
   {
-    files: ['*.vue', '**/*.vue'],
+    files: ["*.vue", "**/*.vue"],
     rules: {},
     languageOptions: {
       globals: {
@@ -27,16 +27,16 @@ export default typescriptEslint.config([
       parser: vueParser,
       parserOptions: {
         parser: typescriptEslint.parser,
-        extraFileExtensions: ['.vue'],
-        sourceType: 'module',
+        extraFileExtensions: [".vue"],
+        sourceType: "module",
       },
     },
   },
   {
-    files: ['src/pages/**/*.vue'],
+    files: ["src/pages/**/*.vue", "src/layouts/**/*.vue"],
     rules: {
-      'vue/multi-word-component-names': ['off'],
+      "vue/multi-word-component-names": ["off"],
     },
   },
   eslintConfigPrettier,
-])
+]);
