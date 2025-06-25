@@ -12,6 +12,9 @@ import FeatherIcon from "./feather-icon.vue";
       <FeatherIcon icon="clock" /><span>history</span>
     </RouterLink>
     <div class="spacer"></div>
+    <RouterLink to="/debug">
+      <FeatherIcon icon="crosshair" /><span>debug</span>
+    </RouterLink>
     <RouterLink to="/about">
       <FeatherIcon icon="info" /><span>about</span>
     </RouterLink>
@@ -25,6 +28,7 @@ import FeatherIcon from "./feather-icon.vue";
 .global-nav {
   display: flex;
   width: 8rem;
+  min-width: 8rem;
   flex-direction: column;
   padding: 0.25rem;
   color: var(--color-half);

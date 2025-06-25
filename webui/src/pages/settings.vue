@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+import { useGlobalState } from "@/hooks/useGlobalState";
 import InputText from "@/components/input-text.vue";
 import InputSelect from "@/components/input-select.vue";
 
-const themeColor = ref(localStorage.theme);
+const state = useGlobalState();
+const themeColor = ref(state.value.theme);
 const apiKey = ref<string>("");
 
 const username = ref<string>("");
@@ -17,7 +19,8 @@ const themeOptions = [
 ];
 
 const setTheme = (theme: string) => {
-  localStorage.theme = theme;
+  state.value.theme = theme;
+  console.log(state.value);
   document.documentElement.dataset.theme = theme;
   themeColor.value = theme;
 };

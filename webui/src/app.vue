@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-import GlobalNav from './components/global-nav.vue'
+import { RouterView } from "vue-router";
+
+import GlobalNav from "./components/global-nav.vue";
+import { useGlobalState } from "./hooks/useGlobalState";
+import { watchEffect } from "vue";
+
+const state = useGlobalState();
+
+watchEffect(() => (document.documentElement.dataset.theme = state.value.theme));
 </script>
 
 <template>
@@ -8,7 +15,8 @@ import GlobalNav from './components/global-nav.vue'
   <RouterView />
   <footer>
     made by
-    <a href="https://bsky.app/profile/evvil.town">wren</a> (c)2025 @<a href="https://evvil.town"
+    <a href="https://bsky.app/profile/evvil.town">wren</a> (c)2025 @<a
+      href="https://evvil.town"
       >evvil.town</a
     >
   </footer>
